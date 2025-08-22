@@ -23,3 +23,10 @@ Ir a la pagina de consola google cloud y descargar una credencial, de alli se ob
 
 1. `GOOGLE_CLIENT_ID` : Id del cliente de la cuenta de google
 2. `GOOGLE_CLIENT_SECRET` : secret del cliente de la cuenta de google
+
+
+## Material extra
+Para saber lo basico de Spring me guio con este video 1: http://youtube.com/watch?v=IPWBQDMIYkc&list=PLr23_YfwEbPRCK4IbemQGwYdgSwfd2aZu&index=2
+Al instalar la dependencia de spring security se activa automaticante.
+En aplication. properties podemos configurar el usuario por defecto.
+Crear archivo de configuracion de spring security en una clase.
