@@ -15,6 +15,7 @@ public class JwtUtils {
     @Value("${jwt.time.expiration}")
     private String timeExpiration;
 
+    /*
 
     //Generar token de acceso.
     //le mandamos por parametro la persona que va a crear el token.
@@ -23,5 +24,7 @@ public class JwtUtils {
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
     }
+
+     */
 
 }

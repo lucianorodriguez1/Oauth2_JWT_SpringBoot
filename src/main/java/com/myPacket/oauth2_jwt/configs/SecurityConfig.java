@@ -1,21 +1,26 @@
 package com.myPacket.oauth2_jwt.configs;
 
+import com.myPacket.oauth2_jwt.services.UserDetailsServiceImp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         //csrf : Cross-Site Request Forgery. Es una vulnerabilidad que tienen las aplicaciones web, mas que nada los formularios.
@@ -29,59 +34,43 @@ public class SecurityConfig {
         //el sessionManagement dice como se maneja la sesion. La ventaja de esto es que podemos guardar
         //info del usuario sin pedirle autenticacion a cada rato. Hay cuatro opciones.
         return httpSecurity
+                .csrf(csrf -> csrf.disable())
+                //.sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) -> esto es mejor cuando se trabaja con JWT.
                 .authorizeHttpRequests(
-                request -> {
-                    request.requestMatchers(HttpMethod.GET,"/api/v1/test").permitAll();
-                    request.anyRequest().authenticated();
-                })
+                        request -> {
+                            //request.requestMatchers(HttpMethod.GET,"/api/v1/test").permitAll();
+
+                            //la diferencia
+                            request.anyRequest().authenticated();
+                        })
                 .formLogin(Customizer.withDefaults())
+                //.httpBasic(Customizer.withDefaults())   // Basic Auth (Postman)
+
                 .oauth2Login(Customizer.withDefaults())
                 .build();
 
     }
 
-    PasswordEncoder passwordEncoder(){
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /*
+
     //se encarga de manejar la autenticacion en nuestra aplicacion.
     @Bean
-    AuthenticationManager authenticationManager(HttpSecurity httpSecurity){
-
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
-*/
 
 
-
-
-     /*
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests((authorize) -> authorize
-                        .anyRequest().authenticated())
-                .oauth2Login(Customizer.withDefaults());
-        return http.build();
+    public AuthenticationProvider authenticationProvider(UserDetailsServiceImp userDetailService) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
-*/
 
 
-
-
-
-    /*
-
-    // @formatter:off
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
-    }
-    // @formatter:on
-*/
 }
